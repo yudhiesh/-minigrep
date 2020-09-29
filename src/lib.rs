@@ -43,10 +43,9 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Result<Vec<&'a str>, String
             results.push(line);
         }
     }
-    if results.len() > 0 {
-        Ok(results)
-    } else {
-        Err(String::from("No match found!"))
+    match results.len() {
+        0 => Err(String::from("No Match Found!")),
+        _ => Ok(results),
     }
 }
 
