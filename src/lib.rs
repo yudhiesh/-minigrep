@@ -24,7 +24,7 @@ impl Config {
 // Returns an error trait called Box which is dynamic
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.filename)?;
-    for line in search(&config.query, &contents) {
+    for line in search(&config.query, &contents)? {
         println!("{:?}", line);
     }
     Ok(())
@@ -34,7 +34,7 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 // connected to the return
 // Query exist as long as contents is there
 //
-pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+pub fn search<'a>(query: &str, contents: &'a str) -> Result<Vec<&'a str>, String> {
     let mut results = Vec::new();
     let query_lowercase = query.to_lowercase();
 
@@ -43,8 +43,11 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
             results.push(line);
         }
     }
-
-    results
+    if results.len() > 0 {
+        Ok(results)
+    } else {
+        Err(String::from("No match found!"))
+    }
 }
 
 #[cfg(test)]
