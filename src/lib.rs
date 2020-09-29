@@ -34,14 +34,17 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 // connected to the return
 // Query exist as long as contents is there
 //
-pub fn search<'a>(query: &str, contents: &'a str) -> Result<Vec<&'a str>, Box<dyn Error>> {
-    let mut vec = Vec::new();
-    for string in contents.lines() {
-        if string.contains(query) {
-            vec.push(string);
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut results = Vec::new();
+    let query_lowercase = query.to_lowercase();
+
+    for line in contents.lines() {
+        if line.contains(&query_lowercase) {
+            results.push(line);
         }
     }
-    Ok(vec);
+
+    results
 }
 
 #[cfg(test)]
@@ -56,6 +59,15 @@ Rust:
 safe, fast, productive.
 Pick three.";
 
+        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
+    }
+    #[test]
+    fn case_insensitive() {
+        let query = "dUcT";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.";
         assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
 }
