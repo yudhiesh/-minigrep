@@ -61,7 +61,7 @@ Rust:
 safe, fast, productive.
 Pick three.";
 
-        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
+        assert_eq!(Ok(vec!["safe, fast, productive."]), search(query, contents));
     }
     #[test]
     fn case_insensitive() {
@@ -70,6 +70,6 @@ Pick three.";
 Rust:
 safe, fast, productive.
 Pick three.";
-        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
+        assert_eq!(Ok(vec!["safe, fast, productive."]), search(query, contents));
     }
 }
