@@ -1,3 +1,4 @@
+use std::env;
 use std::error::Error;
 use std::fs;
 
@@ -12,12 +13,17 @@ pub struct Config {
 }
 impl Config {
     // Error in the form of a static lifetime as it is a str not a String
-    pub fn parse_config(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err("Not enough arguments passed in!");
-        }
-        let query = args[1].clone();
-        let filename = args[2].clone();
+    pub fn parse_config(mut args: env::Args) -> Result<Config, &'static str> {
+        args.next();
+
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Did not get a query!"),
+        };
+        let filename = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Did not get a filename!"),
+        };
         Ok(Config { query, filename })
     }
 }
@@ -35,14 +41,15 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 // Query exist as long as contents is there
 //
 pub fn search<'a>(query: &str, contents: &'a str) -> Result<Vec<&'a str>, String> {
-    let mut results = Vec::new();
-    let query_lowercase = query.to_lowercase();
-
-    for line in contents.lines() {
-        if line.contains(&query_lowercase) {
-            results.push(line);
-        }
-    }
+    // Using an iterator you do not need to specify a vec and push the contents of it into
+    // the vec again
+    // Instead it can all be collected and put into a variable
+    // Need to specify the type of results
+    // Vec<_> is a generic type where the compiler will infer the type for you
+    let results: Vec<_> = contents
+        .lines()
+        .filter(|line| line.contains(query))
+        .collect();
     match results.len() {
         0 => Err(String::from("No Match Found!")),
         _ => Ok(results),
